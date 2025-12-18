@@ -1,0 +1,25 @@
+=begin rakudoc :!toc
+=TITLE RakuDoc Editor
+=for AUTHOR :hidden
+Richard N. Hainsworth, aka finanalyst
+=for LICENSE :hidden
+Artistic-2.0
+=VERSION v0.1.0
+
+=head Overview
+
+This repo contains the files needed to create a Docker image that when run
+locally will allow a browser to create an edit a RakuDoc source file.
+
+A directory is needed into which the source file is copied, eg. C<~/rakudoc-test>.
+
+The container is deployed by running the following inside the directory.
+
+    podman run -v .:browser/publication docker.io/finanalyst/browser-editor:latest
+
+The sample file C<sample.rakudoc> is copied into the directory. Inside the browser, the sample
+file can be edited or a new one created, and the file name can be changed.
+
+=place semantic:AUTHOR :caption<Credits>
+=place semantic:LICENCE :caption<License>
+=end rakudoc

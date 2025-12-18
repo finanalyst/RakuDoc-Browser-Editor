@@ -1,0 +1,26 @@
+#controls {
+    height: 7.5vh;
+    width: 98vw;
+    #file-picker {
+        opacity: 0;
+        width: 0;
+    }
+    label {
+        border: #808080 1px solid;
+        border-radius: 4px;
+        padding: 4px;
+        background: #e9e9ed;
+        font-weight: 500;
+          }
+    }
+#content {
+    display: flex;
+    #renderFrame, #editor {
+      height: 89vh;
+      width: 48vw;
+    }
+    #editor-panel {
+      height: 89vh;
+      width: 48vw;
+    }
+}

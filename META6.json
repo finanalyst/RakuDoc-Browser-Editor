@@ -1,0 +1,24 @@
+{
+    "name": "RakuDoc-Browser-Editor",
+    "description": "Browser side editor for RakuDoc, launched from container",
+    "version": "0.1.0",
+    "raku": "6.d",
+    "authors": [
+        "Richard Hainsworth"
+    ],
+    "auth": "zef:finanalyst",
+    "depends": [
+        "Cro::HTTP::Router",
+        "Cro::HTTP::Server",
+        "Cro::HTTP::Log::File",
+        "Rakuast::RakuDoc::Render"
+    ],
+    "support": {
+        "email": "richard@hainsworth.wales",
+        "bugtracker": "https://github.com/finanalyst/RakuDoc-Browser-Editor/issues",
+        "source": "https://github.com/finanalyst/RakuDoc-Browser-Editor.git"
+    },
+    "license": "Artistic-2.0",
+    "source-url": "git://github.com/finanalyst/RakuDoc-Browser-Editor.git",
+    "source-type": "git"
+}

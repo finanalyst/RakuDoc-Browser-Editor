@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>RakuDoc Editor</title>
+        <link rel="stylesheet" href="browser.css"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.39.1/ace.js" integrity="sha512-tGc7XQXpQYGpFGmdQCEaYhGdJ8B64vyI9c8zdEO4vjYaWRCKYnLy+HkudtawJS3ttk/Pd7xrkRjK8ijcMMyauw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <link rel="icon" href="https://irclogs.raku.org/favicon.ico">
+        <script src="browser-editor.js"></script>
+    </head>
+    <body>
+        <div id="controls">
+            <input type="text" id="filename"/>
+            <label for="file-picker">Select another rakudoc file</label>
+            <input type="file" id="file-picker" accept=".rakudoc"/>
+            <button id="load-file">Load</button>
+            <button id="save-file">Save</button>
+        </div>
+        <div id="content">
+            <div id="editor-panel">
+                <div id="editor"></div>
+            </div>
+            <div id="preview-panel">
+                <iframe id="renderFrame"></iframe>
+            </div>
+        </div>
+    </body>
+</html>
