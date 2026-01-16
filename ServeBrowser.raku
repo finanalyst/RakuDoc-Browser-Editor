@@ -6,9 +6,10 @@ use Cro::HTTP::Log::File;
 use Cro::HTTP::Router::WebSocket;
 use RakuDoc::To::HTML;
 
-'assets/sample.rakudoc'.IO.copy('publication/sample.rakudoc')
-    unless 'publication/sample.rakudoc'.IO ~~ :e & :f ;
-
+for <sample rakudociem-ipsum> {
+    "assets/$_.rakudoc".IO.copy("publication/$_.rakudoc")
+        unless "publication/$_.rakudoc".IO ~~ :e & :f;
+}
 my RakuDoc::Processor $rdp = RakuDoc::To::HTML.new.rdp;
 $rdp.add-templates( {
     footer => -> %prm, $tmpl {
@@ -20,7 +21,7 @@ $rdp.add-templates( {
         FOOTER
     },
 }, :source<Browser editor>);
-my $host = 'localhost'; #= default host
+my $host = '0.0.0.0'; #= default host
 my $port = 3000; #= default port, with defaults set browser to localhost:3000
 my $publication = 'publication/';
 my $landing = 'browser-editor.html';

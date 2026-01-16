@@ -3,6 +3,7 @@ var editor;
 var taintedRender = true;
 var browserSocket;
 var renderFrame;
+var renderingPane;
 var initialContent;
 var fileName;
 fileName = 'sample.rakudoc';
@@ -14,7 +15,8 @@ function sendSource() {
     if(socketIsOpen(browserSocket)) {
         browserSocket.send(JSON.stringify({
             "source" : source
-        }))
+        }));
+//        renderingPane.showModal();
     }
 }
 function fetchFile() {
@@ -47,9 +49,11 @@ window.addEventListener('load', function () {
     saveButton = document.getElementById('save-file');
     loadButton = document.getElementById('load-file');
     fileNameInput.value = fileName;
+    renderFrame = document.getElementById('renderFrame');
+//    renderingPane = document.getElementById('renderingModal');
     filePicker.addEventListener('change', function() {
         if (filePicker.files.length === 1) {
-            fileName = filePicker.files[0];
+            fileName = filePicker.files[0].name;
             fileNameInput.value = fileName;
         }
     });
@@ -61,7 +65,6 @@ window.addEventListener('load', function () {
         fileName = fileNameInput.value;
         fetchFile();
     });
-    renderFrame = document.getElementById('renderFrame');
     editor = ace.edit("editor");
     editor.setOptions({
        behavioursEnabled: true,
@@ -90,6 +93,7 @@ window.addEventListener('load', function () {
                 }
                 else if ( parsedData.hasOwnProperty('html') && parsedData.html != '' ) {
                     renderFrame.src = blobify(blobUrl, parsedData.html);
+                    renderingPane.close();
                 }
                 else if ( parsedData.hasOwnProperty('rakudoc') && parsedData.rakudoc != '' ) {
                     editor.session.setValue( parsedData.rakudoc );
