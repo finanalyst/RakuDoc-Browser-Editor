@@ -1,10 +1,13 @@
 FROM docker.io/finanalyst/raku-cro-rrr-enum-base
 
 RUN mkdir browser browser/assets browser/publication
+RUN adduser -D rakudocer
+RUN chown rakudocer:rakudocer browser browser/publication browser/assets
 WORKDIR browser
+ARG CACHEBUST=11
 COPY assets/ ./assets
-COPY publication/ ./publication
-COPY ServeBrowser.raku .
 RUN sass assets/browser.scss:assets/browser.css
-RUN raku -c ServeBrowser.raku
-CMD raku ServeBrowser.raku
+COPY WebServeBrowser.raku .
+RUN raku -c WebServeBrowser.raku
+USER rakudocer
+CMD raku WebServeBrowser.raku

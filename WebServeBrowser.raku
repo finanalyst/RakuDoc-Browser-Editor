@@ -24,7 +24,7 @@ $rdp.add-templates( {
 my $host = '0.0.0.0'; #= default host
 my $port = 3000; #= default port, with defaults set browser to localhost:3000
 my $publication = 'publication/';
-my $landing = 'browser-editor.html';
+my $landing = 'web-browser-editor.html';
 my $app = route {
     get -> *@path {
         static "assets", @path, :indexes($landing,);

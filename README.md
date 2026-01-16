@@ -16,6 +16,36 @@
 podman run -v .:browser/publication docker.io/finanalyst/browser-editor:latest
 ```
 <span class="para" id="7d21cec"></span>The sample file `sample.rakudoc` is copied into the directory. Inside the browser, the sample file can be edited or a new one created, and the file name can be changed.   
+<span class="para" id="e21fc9c"></span>The *web-browser-editor* files are intended for use on a server publicly accessible. The container created by `Web.dockerfile` is intended to be placed behind an Apache or nginx reverse-proxy.   
+<span class="para" id="32393e2"></span>The following is a sample extract from an Apache2 conf file:   
+
+```
+    ProxyRequests Off
+    ProxyVia on
+
+    RewriteEngine on
+    RewriteCond %{HTTP:Connection} Upgrade [NC]
+
+    RewriteRule (/'browser-socket'.*) ws://127.0.0.1:12345/$1 [P,L]
+
+    RewriteEngine off
+
+    ProxyPass /browser-socket ws://127.0.0.1:12345/browser-socket
+    ProxyPassReverse /browser-socket ws://127.0.0.1:12345/browser-socket
+    ProxyPass /rakudoc_editor/ http://127.0.0.1:12345/
+
+    ProxyPass /browser-socket ws://127.0.0.1:12345/browser-socket
+    ProxyPassReverse /browser-socket ws://127.0.0.1:12345/browser-socket
+    ProxyPass /rakudoc_editor/ http://127.0.0.1:12345/
+    ProxyPassReverse /rakudoc_editor/ http://127.0.0.1:12345/
+```
+<span class="para" id="6914cf3"></span>The browser is given a URL `www.example.com/rakudoc_editor/` the final `/` is important. Finally, the container is started as follows:   
+
+```
+sudo docker pull docker.io/finanalyst/rakudoc_browser:latest
+sudo docker run -d -p 12345:3000 --rm docker.io/finanalyst/rakudoc_browser
+```
+<span class="para" id="e1b6bf2"></span>The `3000` is the port being listened to by the Cro server defined by `WebServeBrowser.raku`   
 <div id="Credits"></div>
 
 ## Credits
@@ -34,9 +64,9 @@ Richard N. Hainsworth, aka finanalyst
 
 ----
 
-Rendered from docs/README.rakudoc/README at 17:30 UTC on 2025-12-18
+Rendered from docs/README.rakudoc/README at 20:43 UTC on 2026-01-16
 
-Source last modified at 17:29 UTC on 2025-12-18
+Source last modified at 20:42 UTC on 2026-01-16
 
 
 

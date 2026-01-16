@@ -20,6 +20,41 @@ The container is deployed by running the following inside the directory.
 The sample file C<sample.rakudoc> is copied into the directory. Inside the browser, the sample
 file can be edited or a new one created, and the file name can be changed.
 
+The I<web-browser-editor> files are intended for use on a server publicly accessible.
+The container created by C<Web.dockerfile> is intended to be placed behind an Apache or nginx
+reverse-proxy.
+
+The following is a sample extract from an Apache2 conf file:
+=begin code
+    ProxyRequests Off
+    ProxyVia on
+
+    RewriteEngine on
+    RewriteCond %{HTTP:Connection} Upgrade [NC]
+
+    RewriteRule (/'browser-socket'.*) ws://127.0.0.1:12345/$1 [P,L]
+
+    RewriteEngine off
+
+    ProxyPass /browser-socket ws://127.0.0.1:12345/browser-socket
+    ProxyPassReverse /browser-socket ws://127.0.0.1:12345/browser-socket
+    ProxyPass /rakudoc_editor/ http://127.0.0.1:12345/
+
+    ProxyPass /browser-socket ws://127.0.0.1:12345/browser-socket
+    ProxyPassReverse /browser-socket ws://127.0.0.1:12345/browser-socket
+    ProxyPass /rakudoc_editor/ http://127.0.0.1:12345/
+    ProxyPassReverse /rakudoc_editor/ http://127.0.0.1:12345/
+=end code
+
+The browser is given a URL C<www.example.com/rakudoc_editor/> the final C</> is important.
+Finally, the container is started as follows:
+=begin code
+sudo docker pull docker.io/finanalyst/rakudoc_browser:latest
+sudo docker run -d -p 12345:3000 --rm docker.io/finanalyst/rakudoc_browser
+=end code
+
+The C<3000> is the port being listened to by the Cro server defined by C<WebServeBrowser.raku>
+
 =place semantic:AUTHOR :caption<Credits>
 =place semantic:LICENCE :caption<License>
 =end rakudoc
