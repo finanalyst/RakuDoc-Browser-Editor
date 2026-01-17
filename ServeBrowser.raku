@@ -6,7 +6,7 @@ use Cro::HTTP::Log::File;
 use Cro::HTTP::Router::WebSocket;
 use RakuDoc::To::HTML;
 
-for <sample rakudociem-ipsum ext-rakudociem-ipsum> {
+for <sample rakudociem-ipsum> {
     "assets/$_.rakudoc".IO.copy("publication/$_.rakudoc")
         unless "publication/$_.rakudoc".IO ~~ :e & :f;
 }
@@ -24,7 +24,7 @@ $rdp.add-templates( {
 my $host = '0.0.0.0'; #= default host
 my $port = 3000; #= default port, with defaults set browser to localhost:3000
 my $publication = 'publication/';
-my $landing = 'web-browser-editor.html';
+my $landing = 'browser-editor.html';
 my $app = route {
     get -> *@path {
         static "assets", @path, :indexes($landing,);

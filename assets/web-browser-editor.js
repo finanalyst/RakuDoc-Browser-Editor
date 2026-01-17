@@ -4,8 +4,8 @@ var browserSocket;
 var renderFrame;
 var renderingPane;
 var initialContent;
-var fileName;
-fileName = 'sample.rakudoc';
+var fileName = 'sample.rakudoc';
+var saveName = 'MyRakuDoc';
 const socketIsOpen = function(ws) {
     return ws.readyState === ws.OPEN
 }
@@ -28,12 +28,16 @@ function fetchFile() {
 }
 function saveSource() {
     let source = editor.session.getValue();
-    if(socketIsOpen(browserSocket)) {
-        browserSocket.send(JSON.stringify({
-            "save": fileName,
-            "save-source" : source
-        }))
-    }
+    let blob = new Blob([source], { type: 'text/plain' });
+    let url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = downLoadName.value + '.rakudoc';
+    link.style.display = 'none'; // Ensure it's hidden
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url); // Clean up the URL
 }
 var blobUrl;
 const blobify = ( bUrl, data ) => {
@@ -44,25 +48,32 @@ const blobify = ( bUrl, data ) => {
 };
 window.addEventListener('load', function () {
     filePicker = document.getElementById('file-picker');
-    fileNameInput = document.getElementById('filename');
-    saveButton = document.getElementById('save-file');
-    loadButton = document.getElementById('load-file');
-    fileNameInput.value = fileName;
+    fileNameSelect = document.getElementById('filename');
+    downloadButton = document.getElementById('downLoadFile');
+    downloadName = document.getElementById('downLoadName');
+    fileNameSelect.addEventListener('change', (event) => {
+        fileName = event.target.value;
+        fetchFile();
+    });
+    downloadName.value = saveName;
     renderFrame = document.getElementById('renderFrame');
 //    renderingPane = document.getElementById('renderingModal');
     filePicker.addEventListener('change', function() {
         if (filePicker.files.length === 1) {
-            fileName = filePicker.files[0].name;
-            fileNameInput.value = fileName;
+            var file = filePicker.files[0];
+            fileName = file.name;
+            var reader = new FileReader();
+            reader.readAsText(file,'UTF-8');
+            reader.onload = readerEvent => {
+              var content = readerEvent.target.result; // this is the content!
+              editor.session.setValue( content );
+              sendSource();
+              initialContent = content;
+            }
         }
     });
-    saveButton.addEventListener('click', function() {
-        fileName = fileNameInput.value;
+    downloadButton.addEventListener('click', function() {
         saveSource();
-    });
-    loadButton.addEventListener('click', function() {
-        fileName = fileNameInput.value;
-        fetchFile();
     });
     editor = ace.edit("editor");
     editor.setOptions({
@@ -94,7 +105,7 @@ window.addEventListener('load', function () {
                 }
                 else if ( parsedData.hasOwnProperty('html') && parsedData.html != '' ) {
                     renderFrame.src = blobify(blobUrl, parsedData.html);
-                    renderingPane.close();
+//                    renderingPane.close();
                 }
                 else if ( parsedData.hasOwnProperty('rakudoc') && parsedData.rakudoc != '' ) {
                     editor.session.setValue( parsedData.rakudoc );

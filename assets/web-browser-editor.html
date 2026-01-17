@@ -11,11 +11,15 @@
     </head>
     <body>
         <div id="controls">
-            <input type="text" id="filename"/>
-            <label for="file-picker">Select another rakudoc file</label>
+            <select name="samples" id="filename">
+                <option value="sample.rakudoc" selected>sample</option>
+                <option value="rakudociem-ipsum.rakudoc">render test</option>
+                <option value="ext-rakudociem-ipsum.rakudoc">enumeration render test</option>
+            </select>
+            <label for="file-picker">Upload your file</label>
             <input type="file" id="file-picker" accept=".rakudoc"/>
-            <button id="load-file">Load</button>
-            <button id="save-file">Save</button>
+            <button id="downLoadFile">Download rakudoc as:</button>
+            <input type="text" id="downLoadName" />
         </div>
         <div id="content">
             <div id="editor-panel">
