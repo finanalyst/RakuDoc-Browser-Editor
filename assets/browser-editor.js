@@ -6,6 +6,7 @@ var renderFrame;
 var renderingPane;
 var initialContent;
 var fileName;
+var onlineToggle = false;
 fileName = 'sample.rakudoc';
 const socketIsOpen = function(ws) {
     return ws.readyState === ws.OPEN
@@ -14,7 +15,8 @@ function sendSource() {
     let source = editor.session.getValue();
     if(socketIsOpen(browserSocket)) {
         browserSocket.send(JSON.stringify({
-            "source" : source
+            "source" : source,
+            "online" : onlineToggle
         }));
 //        renderingPane.showModal();
     }
@@ -50,6 +52,7 @@ window.addEventListener('load', function () {
     loadButton = document.getElementById('load-file');
     fileNameInput.value = fileName;
     renderFrame = document.getElementById('renderFrame');
+    onlineToggleBtn = document.getElementById('online-toggle');
 //    renderingPane = document.getElementById('renderingModal');
     filePicker.addEventListener('change', function() {
         if (filePicker.files.length === 1) {
@@ -64,6 +67,11 @@ window.addEventListener('load', function () {
     loadButton.addEventListener('click', function() {
         fileName = fileNameInput.value;
         fetchFile();
+    });
+    onlineToggleBtn.addEventListener('click', function( ) {
+        onlineToggle = ! onlineToggle;
+        onlineToggleBtn.innerHTML = onlineToggle ? 'Go off Line' : 'Go on line';
+        sendSource();
     });
     editor = ace.edit("editor");
     editor.setOptions({
@@ -93,7 +101,7 @@ window.addEventListener('load', function () {
                 }
                 else if ( parsedData.hasOwnProperty('html') && parsedData.html != '' ) {
                     renderFrame.src = blobify(blobUrl, parsedData.html);
-                    renderingPane.close();
+//                    renderingPane.close();
                 }
                 else if ( parsedData.hasOwnProperty('rakudoc') && parsedData.rakudoc != '' ) {
                     editor.session.setValue( parsedData.rakudoc );

@@ -6,6 +6,7 @@ var renderingPane;
 var initialContent;
 var fileName = 'sample.rakudoc';
 var saveName = 'MyRakuDoc';
+var frameworkToggle = false;
 const socketIsOpen = function(ws) {
     return ws.readyState === ws.OPEN
 }
@@ -13,7 +14,8 @@ function sendSource() {
     let source = editor.session.getValue();
     if(socketIsOpen(browserSocket)) {
         browserSocket.send(JSON.stringify({
-            "source" : source
+            "source" : source,
+            "online" : frameworkToggle
         }));
 //        renderingPane.showModal();
     }
@@ -57,6 +59,7 @@ window.addEventListener('load', function () {
     });
     downloadName.value = saveName;
     renderFrame = document.getElementById('renderFrame');
+    frameworkToggleBtn = document.getElementById('framework-toggle');
 //    renderingPane = document.getElementById('renderingModal');
     filePicker.addEventListener('change', function() {
         if (filePicker.files.length === 1) {
@@ -74,6 +77,11 @@ window.addEventListener('load', function () {
     });
     downloadButton.addEventListener('click', function() {
         saveSource();
+    });
+    frameworkToggleBtn.addEventListener('click', function( ) {
+        frameworkToggle = ! frameworkToggle;
+        frameworkToggleBtn.innerHTML = frameworkToggle ? 'Minimal single file' : 'Bulma & plugins';
+        sendSource();
     });
     editor = ace.edit("editor");
     editor.setOptions({

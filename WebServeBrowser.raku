@@ -5,17 +5,29 @@ use Cro::HTTP::Server;
 use Cro::HTTP::Log::File;
 use Cro::HTTP::Router::WebSocket;
 use RakuDoc::To::HTML;
+use RakuDoc::To::HTML-Extra;
 
 for <sample rakudociem-ipsum ext-rakudociem-ipsum> {
     "assets/$_.rakudoc".IO.copy("publication/$_.rakudoc")
         unless "publication/$_.rakudoc".IO ~~ :e & :f;
 }
 my RakuDoc::Processor $rdp = RakuDoc::To::HTML.new.rdp;
+my RakuDoc::Processor $rdp-online = RakuDoc::To::HTML-Extra.new.rdp;
 $rdp.add-templates( {
     footer => -> %prm, $tmpl {
         qq:to/FOOTER/;
         \n<div class="footer">
-            Modified {(sprintf( "at %02d:%02d UTC on %s", .hour, .minute, .yyyy-mm-dd) with now.DateTime)}</span>
+            Single-file HTML Modified {(sprintf( "at %02d:%02d UTC on %s", .hour, .minute, .yyyy-mm-dd) with now.DateTime)}</span>
+        { qq[<div class="warnings">%prm<warnings>\</div>] if %prm<warnings> }
+        </div>
+        FOOTER
+    },
+}, :source<Browser editor>);
+$rdp-online.add-templates( {
+    footer => -> %prm, $tmpl {
+        qq:to/FOOTER/;
+        \n<div class="footer">
+            Online Bulma HTML Modified {(sprintf( "at %02d:%02d UTC on %s", .hour, .minute, .yyyy-mm-dd) with now.DateTime)}</span>
         { qq[<div class="warnings">%prm<warnings>\</div>] if %prm<warnings> }
         </div>
         FOOTER
@@ -35,10 +47,12 @@ my $app = route {
                 my $json = await $message.body;
                 if $json<source> {
                     my $ast;
+                    my $try-online;
                     my $error = '';
                     my $html;
                     try { $ast = $json<source>.AST }
-                    $html = $rdp.render($ast);
+                    try { $try-online = $json<online> }
+                    $html = $try-online ?? $rdp-online.render($ast) !! $rdp.render($ast);
                     CATCH {
                         default {
                             $error = .message;
