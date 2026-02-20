@@ -4,7 +4,7 @@ RUN mkdir browser browser/assets browser/publication
 RUN adduser -D rakudocer
 RUN chown rakudocer:rakudocer browser browser/publication browser/assets
 WORKDIR browser
-ARG CACHEBUST=11112stwz
+ARG CACHEBUST=zyyczddzzzouyxxa
 COPY assets/ ./assets
 RUN sass assets/browser.scss:assets/browser.css
 COPY WebServeBrowser.raku .

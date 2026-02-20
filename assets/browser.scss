@@ -24,3 +24,26 @@
       width: 48vw;
     }
 }
+#downLoadName {
+    border-width: 1px 0 1px 1px;
+    margin-right: 0;
+    padding-right: 0;
+    border-radius: 5px 0 0 5px;
+}
+#format {
+    margin-left: 0;
+    padding-left: 0;
+    translate: -4px 0;
+    border-radius: 0 5px 5px 0;
+    border-width: 1px 1px 1px 0;
+    width: 4rem;
+}
+#signal {
+	width: 2rem;
+	background-color: red;
+	display: inline-block;
+	height: 2rem;
+	border-radius: 1rem;
+	margin-left: 2rem;
+	translate: 0 -0.25rem;
+}

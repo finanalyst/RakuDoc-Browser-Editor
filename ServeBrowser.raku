@@ -51,15 +51,23 @@ my $app = route {
                     my $error = '';
                     my $html;
                     try { $ast = $json<source>.AST }
-                    try { $try-online = $json<online> }
-                    $html = $try-online ?? $rdp-online.render($ast) !! $rdp.render($ast);
-                    CATCH {
-                        default {
-                            $error = .message;
-                            $html = '';
-                        }
+                    if $! {
+                        $html = q:to/TOP/ ~ $!.message ~ q:to/END/;
+                        <html>
+                        <head><title>Parsing error</title></head>
+                        <body><p>The RakuDoc source has an error:</p>
+                        <p>
+                        TOP
+                        </p>
+                        </body>
+                        </html>
+                        END
                     }
-                    emit({ :$html, :$error })
+                    else {
+                        $try-online = $json<online> // False;
+                        $html = $try-online ?? $rdp-online.render($ast) !! $rdp.render($ast);
+                    }
+                    emit({ :$html })
                 }
                 if $json<loaded> {
                     emit({ :connection<Confirmed> })

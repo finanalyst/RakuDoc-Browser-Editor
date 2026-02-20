@@ -6,9 +6,16 @@ var renderingPane;
 var initialContent;
 var fileName = 'sample.rakudoc';
 var saveName = 'MyRakuDoc';
+var signal;
+var rakuDocSource = true; // if false then HTML
+var formatType = '.rakudoc';
 var frameworkToggle = false;
 const socketIsOpen = function(ws) {
     return ws.readyState === ws.OPEN
+}
+const signalLight = function( type ) {
+    signal.style.backgroundColor = type ? 'red' : 'green';
+    signal.title = type ? 'Processing' : 'Rendered'
 }
 function sendSource() {
     let source = editor.session.getValue();
@@ -17,7 +24,7 @@ function sendSource() {
             "source" : source,
             "online" : frameworkToggle
         }));
-//        renderingPane.showModal();
+        signalLight( true );
     }
 }
 function fetchFile() {
@@ -28,19 +35,6 @@ function fetchFile() {
     }
 
 }
-function saveSource() {
-    let source = editor.session.getValue();
-    let blob = new Blob([source], { type: 'text/plain' });
-    let url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = downLoadName.value + '.rakudoc';
-    link.style.display = 'none'; // Ensure it's hidden
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url); // Clean up the URL
-}
 var blobUrl;
 const blobify = ( bUrl, data ) => {
     if ( bUrl !== null ) { URL.revokeObjectURL( bUrl ) }
@@ -48,6 +42,25 @@ const blobify = ( bUrl, data ) => {
     bUrl = URL.createObjectURL( blob );
     return bUrl
 };
+function saveSource() {
+    let url;
+    if ( rakuDocSource ) {
+        let source = editor.session.getValue();
+        let blob = new Blob([source], { type: 'text/plain' });
+        url = window.URL.createObjectURL(blob);
+    }
+    else {
+        url = window.blobUrl;
+    }
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = downLoadName.value + formatType;
+    link.style.display = 'none'; // Ensure it's hidden
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url); // Clean up the URL
+}
 window.addEventListener('load', function () {
     filePicker = document.getElementById('file-picker');
     fileNameSelect = document.getElementById('filename');
@@ -58,8 +71,12 @@ window.addEventListener('load', function () {
         fetchFile();
     });
     downloadName.value = saveName;
+    signal = document.getElementById('signal');
     renderFrame = document.getElementById('renderFrame');
+    sourceFileToggleBtn = document.getElementById('source-toggle');
     frameworkToggleBtn = document.getElementById('framework-toggle');
+    formatTypeValue = document.getElementById('format');
+    formatTypeValue.value = formatType;
 //    renderingPane = document.getElementById('renderingModal');
     filePicker.addEventListener('change', function() {
         if (filePicker.files.length === 1) {
@@ -75,6 +92,7 @@ window.addEventListener('load', function () {
             }
         }
     });
+
     downloadButton.addEventListener('click', function() {
         saveSource();
     });
@@ -83,6 +101,12 @@ window.addEventListener('load', function () {
         frameworkToggleBtn.innerHTML = frameworkToggle ? 'Minimal single file' : 'Bulma & plugins';
         sendSource();
     });
+    sourceFileToggleBtn.addEventListener('click', function( ) {
+       rakuDocSource = ! rakuDocSource;
+       sourceFileToggleBtn.innerHTML = rakuDocSource ? 'RakuDoc source' : 'HTML Rendering';
+       formatType = rakuDocSource ? '.rakudoc' : '.html';
+       formatTypeValue.value = formatType;
+   });
     editor = ace.edit("editor");
     editor.setOptions({
        behavioursEnabled: true,
@@ -112,16 +136,14 @@ window.addEventListener('load', function () {
                     if ( initialContent == null ) { fetchFile() };
                 }
                 else if ( parsedData.hasOwnProperty('html') && parsedData.html != '' ) {
-                    renderFrame.src = blobify(blobUrl, parsedData.html);
-//                    renderingPane.close();
+                    blobUrl = blobify(blobUrl, parsedData.html)
+                    renderFrame.src = blobUrl;
+                    signalLight( false );
                 }
                 else if ( parsedData.hasOwnProperty('rakudoc') && parsedData.rakudoc != '' ) {
                     editor.session.setValue( parsedData.rakudoc );
                     sendSource();
                     initialContent = parsedData.rakudoc;
-                }
-                else if ( parsedData.hasOwnProperty('error') && parsedData.error != '' )  {
-                    alert(parsedData.error) ;
                 }
                 else { alert('Unknown response:' + parsedData) }
             }
@@ -137,6 +159,8 @@ window.addEventListener('load', function () {
         });
     }
     editor.session.on('change', function() {
+        // do not send if render is still processing
+        if ( signal.style.backgroundColor == 'red') { return };
         sendSource();
     });
     if (browserSocket == null ) { connectRender() }

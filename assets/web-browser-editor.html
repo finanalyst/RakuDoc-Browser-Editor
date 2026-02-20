@@ -18,9 +18,12 @@
             </select>
             <label for="file-picker">Upload your file</label>
             <input type="file" id="file-picker" accept=".rakudoc"/>
-            <button id="downLoadFile">Download rakudoc as:</button>
+            <button id="downLoadFile">Download file as:</button>
             <input type="text" id="downLoadName" />
+            <input id="format" disabled>
+            <button id="source-toggle">RakuDoc source</button>
             <button id="framework-toggle">Bulma & plugins</button>
+            <div id="signal" title="Processing">&nbsp;</div>
         </div>
         <div id="content">
             <div id="editor-panel">

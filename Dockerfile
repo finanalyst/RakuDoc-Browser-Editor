@@ -3,7 +3,7 @@ FROM docker.io/finanalyst/raku-cro-rrr-enum-base
 RUN mkdir browser browser/assets browser/publication
 WORKDIR browser
 COPY publication/ ./publication
-ARG RN=4z
+ARG RN=4zdddzzddjjzzxx
 COPY assets/ ./assets
 COPY ServeBrowser.raku .
 RUN sass assets/browser.scss:assets/browser.css

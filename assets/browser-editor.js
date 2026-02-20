@@ -6,10 +6,15 @@ var renderFrame;
 var renderingPane;
 var initialContent;
 var fileName;
+var signal;
 var onlineToggle = false;
 fileName = 'sample.rakudoc';
 const socketIsOpen = function(ws) {
     return ws.readyState === ws.OPEN
+}
+const signalLight = function( type ) {
+    signal.style.backgroundColor = type ? 'red' : 'green';
+    signal.title = type ? 'Processing' : 'Rendered'
 }
 function sendSource() {
     let source = editor.session.getValue();
@@ -18,7 +23,7 @@ function sendSource() {
             "source" : source,
             "online" : onlineToggle
         }));
-//        renderingPane.showModal();
+        signalLight( true );
     }
 }
 function fetchFile() {
@@ -50,10 +55,10 @@ window.addEventListener('load', function () {
     fileNameInput = document.getElementById('filename');
     saveButton = document.getElementById('save-file');
     loadButton = document.getElementById('load-file');
+    signal = document.getElementById('signal');
     fileNameInput.value = fileName;
     renderFrame = document.getElementById('renderFrame');
     onlineToggleBtn = document.getElementById('online-toggle');
-//    renderingPane = document.getElementById('renderingModal');
     filePicker.addEventListener('change', function() {
         if (filePicker.files.length === 1) {
             fileName = filePicker.files[0].name;
@@ -101,15 +106,12 @@ window.addEventListener('load', function () {
                 }
                 else if ( parsedData.hasOwnProperty('html') && parsedData.html != '' ) {
                     renderFrame.src = blobify(blobUrl, parsedData.html);
-//                    renderingPane.close();
+                    signalLight( false );
                 }
                 else if ( parsedData.hasOwnProperty('rakudoc') && parsedData.rakudoc != '' ) {
                     editor.session.setValue( parsedData.rakudoc );
                     sendSource();
                     initialContent = parsedData.rakudoc;
-                }
-                else if ( parsedData.hasOwnProperty('error') && parsedData.error != '' )  {
-                    alert(parsedData.error) ;
                 }
                 else { alert('Unknown response:' + parsedData) }
             }
@@ -125,6 +127,8 @@ window.addEventListener('load', function () {
         });
     }
     editor.session.on('change', function() {
+        // do not send if render is still processing
+        if ( signal.style.backgroundColor == 'red') { return };
         sendSource();
     });
     if (browserSocket == null ) { connectRender() }
