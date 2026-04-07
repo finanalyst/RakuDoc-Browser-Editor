@@ -20,8 +20,10 @@ The container is deployed by running the following inside the directory.
 The sample file C<sample.rakudoc> is copied into the directory. Inside the browser, the sample
 file can be edited or a new one created, and the file name can be changed.
 
+The C<browser-editor> image is created using I<browser-editor.dockerfile>.
+
 The I<web-browser-editor> files are intended for use on a server publicly accessible.
-The container created by C<Web.dockerfile> is intended to be placed behind an Apache or nginx
+The container created by C<rakudoc_browser.dockerfile> is intended to be placed behind an Apache or nginx
 reverse-proxy.
 
 The following is a sample extract from an Apache2 conf file:
@@ -56,5 +58,5 @@ sudo docker run -d -p 12345:3000 --rm docker.io/finanalyst/rakudoc_browser
 The C<3000> is the port being listened to by the Cro server defined by C<WebServeBrowser.raku>
 
 =place semantic:AUTHOR :caption<Credits>
-=place semantic:LICENCE :caption<License>
+=place semantic:LICENSE :caption<License>
 =end rakudoc

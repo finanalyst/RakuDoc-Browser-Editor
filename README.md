@@ -16,7 +16,8 @@
 podman run -v .:browser/publication docker.io/finanalyst/browser-editor:latest
 ```
 <span class="para" id="7d21cec"></span>The sample file `sample.rakudoc` is copied into the directory. Inside the browser, the sample file can be edited or a new one created, and the file name can be changed.   
-<span class="para" id="e21fc9c"></span>The *web-browser-editor* files are intended for use on a server publicly accessible. The container created by `Web.dockerfile` is intended to be placed behind an Apache or nginx reverse-proxy.   
+<span class="para" id="d05f30f"></span>The `browser-editor` image is created using *browser-editor.dockerfile*.   
+<span class="para" id="359840d"></span>The *web-browser-editor* files are intended for use on a server publicly accessible. The container created by `rakudoc_browser.dockerfile` is intended to be placed behind an Apache or nginx reverse-proxy.   
 <span class="para" id="32393e2"></span>The following is a sample extract from an Apache2 conf file:   
 
 ```
@@ -56,17 +57,9 @@ Richard N. Hainsworth, aka finanalyst
 <div id="License"></div>
 
 ## License
-｢semantic_LICENCE UNAVAILABLE｣
+Artistic-2.0
 
 
-
-----
-
-----
-
-Rendered from docs/README.rakudoc/README at 20:43 UTC on 2026-01-16
-
-Source last modified at 20:42 UTC on 2026-01-16
 
 
 
@@ -74,9 +67,7 @@ Source last modified at 20:42 UTC on 2026-01-16
 
 ----
 
-## WARNINGS
+Rendered from docs/README.rakudoc/README at 20:38 UTC on 2026-04-07
 
-1: Placement of undefined semantic block LICENCE
-
-2: 〘 PCell, Waiting for: semantic_LICENCE 〙
+Source last modified at 20:37 UTC on 2026-04-07
 
