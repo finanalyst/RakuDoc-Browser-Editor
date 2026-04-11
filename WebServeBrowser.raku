@@ -7,7 +7,7 @@ use Cro::HTTP::Router::WebSocket;
 use RakuDoc::To::HTML;
 use RakuDoc::To::HTML-Extra;
 
-for <sample rakudociem-ipsum ext-rakudociem-ipsum> {
+for <sample rakudociem-ipsum ext-rakudociem-ipsum sample-citations> {
     "assets/$_.rakudoc".IO.copy("publication/$_.rakudoc")
         unless "publication/$_.rakudoc".IO ~~ :e & :f;
 }
