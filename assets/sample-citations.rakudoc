@@ -4,8 +4,8 @@
 =document :citation-style< evolutionary-bioinformatics >
 =document :citation-style< din-1505-2-alphanumeric >
 =document :citation-style< iso690-author-date-en >
-=document :citation-style< acm-siggraph >
 =document :citation-style< ieee >
+=document :citation-style< acm-siggraph >
 
 =comment Whichever is last will be used (swap the order to try different locales)...
 =document :citation-locale< en-US >
@@ -62,9 +62,6 @@ The design of Raku commenced Q<Apocalypse1; P6&Parrot; ConwayKeynote2010> in lat
         issued      => { 'date-parts' => [[2010, 6]] },
     },
 
-
-
-
 =para
 We have now explored Q<rakudoc-evo-chapter, pp. 32-47> at some length
 whether it would be better to use JSON or XML Q<JSONvsXMLmeta, table 8b>
@@ -76,9 +73,9 @@ a bespoke DSL Q<10.1109/MODELS50736.2021.00031, sect. III> instead.
     type         => "chapter",
     title        => "The Evolution of RakuDoc: From Pod6 to Modern Documentation Standards",
     'container-title' => "The Raku Renaissance: A Comprehensive Guide to the 6.e Ecosystem",
-    author       => { family => "Docsworthy", given => "Poderick" },
-    editor       => { family => "Wally", given => "Larr" },
-    issued       => { 'date-parts' => [[2025, 10]] },
+    author       => [{ family => "Docsworthy", given => "Poderick" }],
+    editor       => [{ family => "Wally", given => "Larr" }],
+    issued       => { 'date-parts' => [[[2025], [10]]] },
     publisher    => "Camelid Press",
     page         => "22-89",
     ISBN         => "978-1-2345-6789-0",
@@ -92,7 +89,7 @@ a bespoke DSL Q<10.1109/MODELS50736.2021.00031, sect. III> instead.
         { family => "Worthington",     given => "Jonathan" }
     ],
     'container-title' => "2021 International Conference on Model Driven Engineering Languages and Systems (MODELS)",
-    issued    => { 'date-parts' => [[2021, 10]] },
+    issued    => { 'date-parts' => [[[2021], ]] },
     publisher => "IEEE",
     DOI       => "10.1109/MODELS50736.2021.00031",
     page      => "233-243",
@@ -102,7 +99,6 @@ a bespoke DSL Q<10.1109/MODELS50736.2021.00031, sect. III> instead.
 =para
 The design of Raku commenced Q<Apocalypse1; P6&Parrot, ch. 1; ConwayKeynote2010, ts=00:03:27>
 in late 2000...
-
 
 =comment  Citation source data specified in CSL-Raku
 =begin citation :category<CSL Raku>
@@ -115,12 +111,12 @@ in late 2000...
                              { family => "Mattijsen",  given => "Elizabeth" },
                              { family => "Conway",     given => "Damian"    },
                            ],
-        editor          => { family => "Smith", given => "Jane" },
+        editor          => [{ family => "Smith", given => "Jane" }],
         container-title => "Modern Markup Systems",
         publisher       => "Butterfly Press",
         publisher-place => "Amsterdam",
         page            => "42-65",
-        issued          => { date-parts => [[2024, 5, 12]] },
+        issued          => { date-parts => [[[2024], [5], [12]]] },
         ISBN            => "978-3-16-148410-0",
     },
     {
@@ -236,16 +232,17 @@ in late 2000...
 
 =comment This citation in PubMed/Medline NLM format
 =citation
-    PMID- 39876543
-    STAT- Publisher
-    DA  - 2025/08/15
-    TI  - The Semantic Elegance of Raku Grammars.
-    BTI - The Semantic Elegance of Raku Grammars
-    AU  - Mercurio S
-    LA  - eng
-    PT  - Book
-    PB  - Butterfly Press
-    SN  - 978-1-2345-9876-0
+        PMID- 39876543
+        STAT- Publisher
+        DA  - 2025/08/15
+        TI  - The Semantic Elegance of Raku Grammars.
+        BTI - The Semantic Elegance of Raku Grammars
+        AU  - Mercurio S
+        LA  - eng
+        PT  - Book
+        PB  - Butterfly Press
+        SN  - 978-1-2345-9876-0
+
 
 =comment This citation in PubMed/Medline XML format
 =citation
@@ -290,8 +287,8 @@ in late 2000...
      </PubmedArticle>
    </PubmedArticleSet>
 
-Z<=for citation  :load< https://gist.githubusercontent.com/larsgw/e5e7e7a5552df67d4dab4bd9378e5412/raw/82183d15daefe1d1c1d2999f261423e72193bf5c/csl-data.json >
->
+=for citation  :load< https://gist.githubusercontent.com/larsgw/e5e7e7a5552df67d4dab4bd9378e5412/raw/82183d15daefe1d1c1d2999f261423e72193bf5c/csl-data.json >
+=              :category<Internet>
 
 Most programming languages use everyday words for their keywords,
 but some have taken that notion much further, basing their entire
@@ -377,10 +374,14 @@ Q<tlhInganHol::yIghun>.
 
 =head1 Categorized Bibliography
 
-=place2 citation:JSON :caption<JSON-related references> :toc
+=place citation:JSON :caption<JSON-related references> :toc :headlevel(2)
 
-=place2 citation:CSL :caption<CSL-related references> :toc
+=place citation:CSL :caption<CSL-related references> :toc :headlevel(2)
 
-=place2 citation:Raku,TeX :caption<Raku or TeX> :toc
+=place citation:Raku,TeX :caption<Raku or TeX> :toc :headlevel(2)
+
+=place citation:Internet :caption<Internet> :toc :headlevel(2)
+
+=place citation:* :caption<Complete bibliography> :toc :headlevel(2)
 
 =end rakudoc
