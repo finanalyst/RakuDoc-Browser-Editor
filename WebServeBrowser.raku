@@ -45,7 +45,7 @@ my $app = route {
                     my $ast;
                     my $try-online;
                     my $html;
-                    my Bool $renderState = false;
+                    my Bool $renderState = False;
                     try { $ast = $json<source>.AST }
                     if $! {
                         $html = q:to/TOP/ ~ $!.message ~ q:to/END/;
@@ -58,12 +58,12 @@ my $app = route {
                         </body>
                         </html>
                         END
-                        $renderState = false;
+                        $renderState = False;
                     }
                     else {
                         $try-online = $json<online> // False;
                         $html = $try-online ?? $rdp-online.render($ast) !! $rdp.render($ast);
-                        $renderState = true;
+                        $renderState = True;
                     }
                     emit({ :$html, $renderState })
                 }
