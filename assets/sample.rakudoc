@@ -1,9 +1,0 @@
-=begin rakudoc :!toc
-=TITLE Sample
-=head Title
-
-Some text
-=for item :bullet<<\c[palm tree]>>
-First item
-
-=end rakudoc

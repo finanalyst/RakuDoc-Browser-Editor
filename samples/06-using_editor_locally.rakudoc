@@ -1,0 +1,50 @@
+=begin rakudoc :!toc
+=head How to experiment with RakuDoc?
+
+To make things easier for experimentation, I have created a docker image `docker.io/finanalyst/browser-editor` which can be run in a container, and accessed using a browser.
+
+However, for the interested reader, the more generic way is to install [Raku](https://raku.org/) and then install the `Rakuast::RakuDoc::Render` module. 
+
+The intention of the browser editor container is for the RakuDoc source to be created and edited in a browser, which also renders the source to HTML on the fly. The edited RakuDoc source can be saved to the container's `browser/publication` directory, and if the container's directory is *bound* to a host directory, then the RakuDoc source will be saved on the local host as well.
+
+The following is written assuming a Linux OS and so it should work with, eg.,  Ubuntu and Apple. I have not tested this with a MS system, and I would be happy to have comments to adapt the following.
+
+Let's start. 
+
+1. We need to have [podman](https://podman-desktop.io/) installed.   
+
+2. We need an empty directory, say `rakudoc-test`, eg. `mkdir rakudoc-test`.   
+
+3. Inside this directory (eg., `cd rakudoc-test`), we run
+```
+podman run -d -v .:/browser/publication --network=host --rm docker.io/finanalyst/browser-editor:latest
+```
+***Update:*** I have removed an underdocumented  constraint. So, this should now be
+```
+podman pull docker.io/finanalyst/browser-editor:latest
+podman run -d -v .:/browser/publication --rm docker.io/finanalyst/browser-editor:latest
+```
+For Mac users, try
+```
+podman pull docker.io/finanalyst/browser-editor:latest
+podman run -d -v .:/browser/publication --platform linux/amd64 --rm docker.io/finanalyst/browser-editor:latest
+```
+4. Point a browser at `localhost:3000` and the window should look like this ![](https://coderlegion.com/?qa=blob&qa_blobid=5640541954896185668)   
+
+5. Edit the rakudoc file, then click on the **Save** button.
+
+6. End the container
+  - run `podman ps` and note the name of the container, eg `good_person`
+  - run `podman stop good_person`
+
+=head2 Some comments about the `podman` command.   
+It should pull in the latest version of the `browser-editor` image, bind the current directory (we are running this inside `rakudoc-test`) to the container's `browser/publication` directory, and then return a SHA identity string (don't worry, it can be forgotten). The `--network=host` is the simplest way to arrange for the container to serve the browser. However, `podman` developers consider this a possible vulnerability and there is a way to set up a network stack to run the image more safely. For those concerned about safety, the container source can be seen at [github browser-editor](https://github.com/finanalyst/RakuDoc-Browser-Editor)
+
+=head About the browser editor
+
+The left-hand panel uses an instance of the Ace editor with a RakuDoc source, and the right-hand panel contains the HTML rendering of that source. The Ace editor allows for the normal editor functions, while the HTML rendering is generated as soon as the editor contents changes. Consequently, when typing it is likely that an invalid RakuDoc source will be created. Once the RakuDoc source is correct, it will be rendered into the right-hand panel. In addition, there are various RakuDoc expressions that are ambiguous, in which case, a warning will be generated that is shown at the bottom of the rendered file.
+
+A small sample RakuDoc file is included to start off. The name of the file can be changed by editing the filename text widget, eg to `web-sample.rakudoc`. By pressing the `Save` button, the RakuDoc source is saved to the container's `browser\publication\web-sample.rakudoc` and if the directories are linked properly, then `web-sample.rakudoc` will be saved on the local system.  Another file `rakudociem-ipsum.rakudoc` can also be selected. It contains examples of nearly all RakuDoc's features, but it can take a while to render.
+
+
+=end rakudoc

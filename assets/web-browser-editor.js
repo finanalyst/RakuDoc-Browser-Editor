@@ -1,30 +1,55 @@
 var editor;
-var taintedRender = true;
 var browserSocket;
 var renderFrame;
 var renderingPane;
 var initialContent;
-var fileName = 'sample.rakudoc';
-var saveName = 'MyRakuDoc';
-var signal;
-var rakuDocSource = true; // if false then HTML
-var formatType = '.rakudoc';
-var frameworkToggle = false;
+var fileName;
+var saveName;
+// render state
+var RS_processing;
+var RS_failed;
+var RS_success;
+var RS_changes;
+var renderInProgress = false;
+var manualRender;
+// rendering
+var forceRenderBtn;
+var timerId;
+var frameworkName;
+// Source selection
+var sampleSelectBtn;
+var sampleSelection;
+var uploadFile;
+var filePicker;
+// download
+var downloadBtn;
+var downloadForm;
+var downloadName;
+
 const socketIsOpen = function(ws) {
+    if ( ws == null ) return false;
     return ws.readyState === ws.OPEN
 }
-const signalLight = function( type ) {
-    signal.style.backgroundColor = type ? 'red' : 'green';
-    signal.title = type ? 'Processing' : 'Rendered'
+const renderState = function( type ) {
+    RS_changes.classList.add('hidden');
+    RS_failed.classList.add('hidden');
+    RS_processing.classList.add('hidden');
+    RS_success.classList.add('hidden');
+    window['RS_' + type ].classList.remove('hidden');
 }
 function sendSource() {
+    if ( editor == null ) {
+        alert('no editor loaded');
+        return
+    }
     let source = editor.session.getValue();
     if(socketIsOpen(browserSocket)) {
         browserSocket.send(JSON.stringify({
             "source" : source,
-            "online" : frameworkToggle
+            "online" : onlineFramework.checked
         }));
-        signalLight( true );
+        renderState( 'processing' );
+        renderInProgress = true;
     }
 }
 function fetchFile() {
@@ -33,7 +58,7 @@ function fetchFile() {
             "filename" : fileName
         }))
     }
-
+    else { alert( 'No link to Render sock' ) }
 }
 var blobUrl;
 const blobify = ( bUrl, data ) => {
@@ -42,9 +67,9 @@ const blobify = ( bUrl, data ) => {
     bUrl = URL.createObjectURL( blob );
     return bUrl
 };
-function saveSource() {
+function saveSource( filename, fileformat ) {
     let url;
-    if ( rakuDocSource ) {
+    if ( fileformat == '.rakudoc'  ) {
         let source = editor.session.getValue();
         let blob = new Blob([source], { type: 'text/plain' });
         url = window.URL.createObjectURL(blob);
@@ -54,30 +79,78 @@ function saveSource() {
     }
     const link = document.createElement('a');
     link.href = url;
-    link.download = downLoadName.value + formatType;
+    link.download = filename + fileformat;
     link.style.display = 'none'; // Ensure it's hidden
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url); // Clean up the URL
 }
+function hideAll( missThis ) {
+        if (missThis !== 'samples' ) { sampleSelection.classList.add('hidden') };
+        if (missThis !== 'upload' ) { filePicker.classList.add('hidden') };
+        if (missThis !== 'download' ) { downloadForm.classList.add('hidden') };
+}
 window.addEventListener('load', function () {
-    filePicker = document.getElementById('file-picker');
-    fileNameSelect = document.getElementById('filename');
-    downloadButton = document.getElementById('downLoadFile');
-    downloadName = document.getElementById('downLoadName');
-    fileNameSelect.addEventListener('change', (event) => {
-        fileName = event.target.value;
-        fetchFile();
-    });
-    downloadName.value = saveName;
-    signal = document.getElementById('signal');
+    RS_processing = document.getElementById('processing');
+    RS_failed = document.getElementById('failed');
+    RS_success = document.getElementById('success');
+    RS_changes = document.getElementById('changes');
+    forceRenderBtn = document.getElementById('forceRender');
+    manualRender = document.getElementById('manualRender');
+    sampleSelectBtn = document.getElementById('select_Sample');
+    sampleSelection = document.getElementById('sampleSelection');
+    fileNameInput = document.getElementById('sourceFileInput');
+    uploadFile = document.getElementById('uploadFile');
+    filePicker = document.getElementById('filePicker');
+    downloadBtn = document.getElementById('downloadBtn');
+    downloadForm = document.getElementById('downloadForm');
+    downloadName = document.getElementById('downloadName');
+    onlineFramework = document.getElementById('onlineFramework');
     renderFrame = document.getElementById('renderFrame');
-    sourceFileToggleBtn = document.getElementById('source-toggle');
-    frameworkToggleBtn = document.getElementById('framework-toggle');
-    formatTypeValue = document.getElementById('format');
-    formatTypeValue.value = formatType;
-//    renderingPane = document.getElementById('renderingModal');
+    // hide popups when radio buttons changed
+    document.getElementById('renderOptions').addEventListener('change', (e) => {  hideAll('all')});
+    document.getElementById('frameworkOptions').addEventListener('change', (e) => { hideAll('all')});
+
+    // Rendering
+    forceRenderBtn.addEventListener('click', function() {
+        hideAll('all');
+        // cancel accumulating timer
+        clearTimeout(timerId);
+        // do not force if already rendering
+        if ( renderingToggle ) { return };
+        sendSource();
+    });
+    // getting source section
+    // get the selection options from the object provide by Cro
+    // fill the selection from the object
+    selectionOptions.forEach( ( pair ) => { 
+        Object.entries( pair ).forEach(([key, value]) => {
+            let option_elem = document.createElement('option');
+            option_elem.value = value;
+            option_elem.textContent = key;
+            sampleSelection.appendChild(option_elem);
+        }) 
+    });
+    sampleSelectBtn.addEventListener('click', function() {
+        hideAll('samples');
+        sampleSelection.classList.toggle('hidden');
+    });
+    sampleSelection.addEventListener('change', (event) => {
+        fileName = event.target.value;
+        fileNameInput.value = fileName;
+        fetchFile();
+        // after fetch make select element disappear
+        sampleSelection.classList.add('hidden');
+    });
+    fileName = Object.values(selectionOptions[0])[0];
+    fileNameInput.value = fileName;
+    // initial source, which is the first item in the object
+    fetchFile();
+    uploadFile.addEventListener('click', function() {
+        hideAll('upload');
+        filePicker.classList.toggle('hidden');
+    });
     filePicker.addEventListener('change', function() {
         if (filePicker.files.length === 1) {
             var file = filePicker.files[0];
@@ -86,27 +159,31 @@ window.addEventListener('load', function () {
             reader.readAsText(file,'UTF-8');
             reader.onload = readerEvent => {
               var content = readerEvent.target.result; // this is the content!
-              editor.session.setValue( content );
-              sendSource();
-              initialContent = content;
+              if (editor == null) { 
+                alert('editor not instantiated')
+              }
+              else {
+                editor.session.setValue( content );
+                sendSource();
+              }
+                initialContent = content;
             }
         }
+        filePicker.classList.add('hidden');
+    });
+    // Download section
+    downloadBtn.addEventListener('click', function() {
+        downloadName.value = fileName.replace(/\.[^/.]+$/, "");
+        hideAll('download');
+        downloadForm.classList.toggle('hidden');
+    });
+    downloadForm.addEventListener( 'submit', function( elem )  {
+        elem.preventDefault();
+        saveSource( downloadName.value, saveFormat.value);
+        downloadForm.classList.add('hidden');
+        return false // prevent default action
     });
 
-    downloadButton.addEventListener('click', function() {
-        saveSource();
-    });
-    frameworkToggleBtn.addEventListener('click', function( ) {
-        frameworkToggle = ! frameworkToggle;
-        frameworkToggleBtn.innerHTML = frameworkToggle ? 'Minimal single file' : 'Bulma & plugins';
-        sendSource();
-    });
-    sourceFileToggleBtn.addEventListener('click', function( ) {
-       rakuDocSource = ! rakuDocSource;
-       sourceFileToggleBtn.innerHTML = rakuDocSource ? 'RakuDoc source' : 'HTML Rendering';
-       formatType = rakuDocSource ? '.rakudoc' : '.html';
-       formatTypeValue.value = formatType;
-   });
     editor = ace.edit("editor");
     editor.setOptions({
        behavioursEnabled: true,
@@ -138,7 +215,13 @@ window.addEventListener('load', function () {
                 else if ( parsedData.hasOwnProperty('html') && parsedData.html != '' ) {
                     blobUrl = blobify(blobUrl, parsedData.html)
                     renderFrame.src = blobUrl;
-                    signalLight( false );
+                    if ( parsedData.renderState ) {
+                        renderState('success')
+                    }
+                    else {
+                        renderState('failed')
+                    }
+                    renderInProgress = false;
                 }
                 else if ( parsedData.hasOwnProperty('rakudoc') && parsedData.rakudoc != '' ) {
                     editor.session.setValue( parsedData.rakudoc );
@@ -159,9 +242,15 @@ window.addEventListener('load', function () {
         });
     }
     editor.session.on('change', function() {
+        // change render status to changes
+        renderState( 'changes' );
+        // do not send if render is manual
+        if ( manualRender.checked) { return };
         // do not send if render is still processing
-        if ( signal.style.backgroundColor == 'red') { return };
-        sendSource();
+        if ( renderInProgress ) { return };
+        // wait for a period after typing to accumulate changes
+        clearTimeout(timerId);
+        timerId = setTimeout( sendSource(), 500 );
     });
     if (browserSocket == null ) { connectRender() }
 });

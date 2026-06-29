@@ -1,0 +1,44 @@
+=begin rakudoc :!toc
+=TITLE Introduction
+
+This is a tool for editing RakuDoc v2 operating from a container. It is still under development, so new features will be added in due course.
+The tool was tested using a recent version of the Firefox browser. Improvements are welcome via PRs.
+
+Several source documents can be pulled from the container - these are listed in the drop-down box on the far left.
+
+The documents include this introduction, the specification and exposition files for RakuDoc v2, a render test file, a citation sample file, and some tutorial files.
+
+It is also possible to upload your own sources to the browser, edit them then download either the edited RakuDoc source or the rendered HTML.
+
+=head User Interface
+
+=numitem Select included file - click on B<Samples & tutorials>, which will pop up a drop down selection, choose the file you want.
+=numitem Upload your own source - click on B<Upload>, which will pop up a file chooser interface that is dependent on your browser and OS. It is set to look for only files with the C<.rakudoc> file extension.
+=numitem Download a file - click on B<Download>, which will pop up a form with a suggested filename and a default C<.rakudoc> extension.
+The file name can be changed. Selecting the C<.rakudoc> file format will download the RakuDoc source, while selecting the C<.html> file format
+will download the rendered HTML.
+
+By default, RakuDoc source is sent to the container for rendering half a second after changes have been made in the source. Changes are not sent if
+the browser has not received the most recent rendering (see the State indicator). For long files or when writing long sections of source, immediate rendering
+can be distracting, so the Rendering process can be switched to I<manual>.
+=counter item :!restart
+=numitem Check the I<Render>B<Auto> setting by clicking on the B<Auto> button I<This is the default>.
+Changes will be sent after a half second delay, unless rendering is proceeding.
+=numitem Check the I<Render>B<Manual> setting by click on the B<Manual> button. Changes will not be sent.
+=numitem Force a rendering by clicking on the B<Force rendering> button. Any changes will be send immediately, unless a previous rendering is being processed.
+
+The RakuDoc renderer has two (currently) HTML renderers: a minimal rendering in which all the CSS and JS code are included in the file, and 
+one that requires an online connection to access the Bulma CSS framework and online plugins. 
+=counter item :!restart
+=numitem Check the I<Framework>B<Minimal> setting by clicking on the B<Minimal> button I<This is the default>.
+=numitem Check the I<Framework>B<Bulma & plugins> setting by click on the B<Bulma & plugins> button.
+=numitem The state of the Rendering process is shown in I<State> section. There are four states:
+=numitem2 I<Success> A rendering has been returned and was was successful in that an HTML file was created. Note, however, that errors in the RakuDoc 
+may still exist, but these should be indicated in the warning section at the end of the rendering.
+=numitem2 I<Failed> The RakuDoc source could not be parsed, and the parser message is returned.
+=numitem2 I<Changes> Changes have been made in the RakuDoc source that have not been rendered. This will occur if the Render process has been toggled 
+to I<Manual> and the source file has been edited, or changes have been made while a previous set of changes is still being rendered.
+=numitem2 I<Processing> The renderer is still rendering the file. This will be shown when the latest changes have been sent to the Renderer, but the
+rendered text has not been returned.
+
+=end rakudoc
