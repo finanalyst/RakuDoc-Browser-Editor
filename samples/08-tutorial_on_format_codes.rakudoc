@@ -1,0 +1,142 @@
+=document :!auto-toc
+=begin rakudoc
+=TITLE Tutorial #2 format codes
+
+In this article I will be discussing some of the markup codes which can be used in a RakuDoc source. 
+
+=head Comparison of styling using other systems
+
+It is very useful for a reader when the author lays out text in a pleasant manner, including spaces
+between paragraphs, and styling words within paragraphs to draw attention to them. 
+
+=nested
+Practices that at first are considered considerate, become mandatory over time. For example, the very
+first styling of text came in Roman times, when good practice was to separate the letters making up words
+with spaces, and then to use punctuation marks. Now it is impossible to eliminate spaces and poor
+punctuation is a sign of a poor education. L<Here is an interesting article on punctuation| https://www.bbc.co.uk/culture/article/20150902-the-mysterious-origins-of-punctuation>.
+
+Let's consider the ways in which we can highlight a word by making it B<bolder>.
+
+In an MS Word document, an author will highlight the words to be emboldened and then use C<Ctrl-B> or the
+equivalent on a Mac. This is a quick and easy way of styling, unless the author decides too many bold
+words exist and wants to restyle to I<Italic>. Then it becomes a hassle to change.
+
+Using MarkDown, it is much easier in that the words to be styled are 'bracketed' using special
+characters, so C<** ... **> are used to embolden, while C<* ... *> are used for italicising. There are a
+few other characters such as `` for code. But as soon as you need more sophisticated styling, such as
+pushing the characters up as in exponentiation, or down, it's necessary to use HTML tags. However, the
+upside is that unlike an WYSIWYG editor, like Word, changing the styling is easy: change the styling
+character. And yet ... each different type of style, or rather its style character, has to be learnt.
+
+=head A declarative approach
+
+RakuDoc approaches styling in a different way: a number of markup codes are defined in a declarative
+manner, and all use the same syntax, C<Upper case letter> C<opener>contentC<closer> e.g., 
+C<B<a basic term>>. 
+
+The simplest RakuDoc markup codes enclose text and provide a rendering, and they are:
+=begin section
+=config C :allow<R V>
+=begin table :!toc :caption('')
+    =row :header
+        =cell Inline markup
+        =cell Instruction
+        =cell Mnemonic
+        =cell HTML equivalent
+        =cell Markdown equivalent
+    =row
+        =cell Basis
+        =cell C«V<B><R<text>>»
+        =cell I<“B for Basis”>
+        =cell C«<strong>R<text></strong>»
+        =cell C«**R<text>**»
+    =row
+        =cell Important
+        =cell C«V<I><R<text>>»
+        =cell I<“I for Important”>
+        =cell C«<em>R<text></em>»
+        =cell C«*R<text>*»
+    =row
+        =cell Unusual
+        =cell C«V<U><R<text>>»
+        =cell I<“U for Unusual”>
+        =cell C«<ins>R<text></ins>»
+        =cell C«<ins>R<text></ins>»
+    =row
+        =cell Weighty
+        =cell C«V<W><R<text>>»
+        =cell I<“W for Weighty”>
+        =cell C«V«<»span style="font-variant: small-caps;">R<text>V«<»/span>»
+        =cell C«V«<»span style="font-variant: small-caps;">R<text>V«<»/span>»
+    =row
+        =cell Struck out
+        =cell C«V<O><R<text>>»
+        =cell I<“O for Out”>
+        =cell C«<del>R<text></del>»
+        =cell C«~~R<text>~~»
+    =row
+        =cell Superscript
+        =cell C«V<H><R<text>>»
+        =cell I<“H for High text”>
+        =cell C«<sup>R<text></sup>»
+        =cell C«<sup>R<text></sup>»
+    =row
+        =cell Subscript
+        =cell C«V<J><R<text>>»
+        =cell I<“J for Junior text”>
+        =cell C«<sub>R<text></sub>»
+        =cell C«<sub>R<text></sub>»
+    =row
+        =cell Code
+        =cell C«V<C><R<text>>»
+        =cell I<“C for Code”>
+        =cell C«<code>R<text></code>»
+        =cell C«`R<text>`»
+
+=end table
+=end section
+
+The aim of the naming system is to provide a hint about the rendering, while leaving it to the renderer
+to implement the final output format.
+
+The same syntax is used for other types of inline content. Almost all the Latin uppercase letters, and a
+Greek uppercase letter have been defined for standard RakuDoc. Rather than describing each of the codes,
+it is probably best just to look at the specification document included in the samples.
+
+However, the formatting markup syntax is not limited to the specified letters, and any Unicode character with the
+Uppercase property can be used for customised content. For example, the C<Rakuast::RakuDoc::Renderer>
+comes with a custom markup for inserting Font Awesome icons into the text. L<Some examples are given in
+the documentation for the module|https://finanalyst.github.io/plugins/FontAwesome>.
+
+The aim of these initial articles is to provide an introduction, rather than give an extensive tutorial.
+The best way to see how the markup codes work is to try them in the browser.
+
+Try copying the following RakuDoc source into this document but without the C<=begin code>/C<=end code> lines.
+=begin code
+This is some B<basic> highlighting showing C<my $new code> with 
+SomeJ<B<junior>>andH<I<higher>> text.
+
+Here are some FontAwesome icons (ℱ = U+2131):
+
+Train normal size ℱ<fas fa-train> Triple size train ℱ<fas fa-train fa-3x>
+
+An animated spinner ℱ<fas fa-sync fa-spin fa-3x fa-fw>
+
+Here is an inline image P<https://cdn.esahubble.org/archives/images/screen/potw2552a.jpg>
+=end code
+
+{ copy the code here }
+
+Click on the framework options in this editor to see how the online version is better than the minimal version.
+
+In the minimal framework, you will find some warnings at the end of the rendered version about errors found
+during the rendering. The simple HTML renderer is designed to be used offline and all the CSS and
+Javascript are contained inside the file.
+
+However, we now expect online connections with CSS, images and JS libraries delivered using CDNs. So the
+HTML-Extra renderer uses the Bulma CSS framework and has plugins to pull in FontAwesome and the
+LeafletMaps library (we will cover this in a future article).
+
+Now click on the C<Go on line> button. It may take some moments to render and pull the image in from the
+Hubble telescope site.
+=end rakudoc

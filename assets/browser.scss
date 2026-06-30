@@ -8,6 +8,7 @@
         opacity: 0;
         width: 0;
         border: 0;
+        z-index: -1;
     }
     .active {
         opacity: 1;
@@ -54,6 +55,11 @@
                     clip-path: circle(); 
                 }
             }
+        }
+        #sourceFileInput {
+            border: none;
+            align-self: baseline;
+            font-weight: bold;
         }
     }
     label {

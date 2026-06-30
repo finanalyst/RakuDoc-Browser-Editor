@@ -4,7 +4,6 @@ var renderFrame;
 var renderingPane;
 var initialContent;
 var fileName;
-var saveName;
 // render state
 var RS_processing;
 var RS_failed;
@@ -43,7 +42,7 @@ function sendSource() {
         return
     }
     let source = editor.session.getValue();
-    if(socketIsOpen(browserSocket)) {
+   if(socketIsOpen(browserSocket)) {
         browserSocket.send(JSON.stringify({
             "source" : source,
             "online" : onlineFramework.checked
@@ -58,7 +57,7 @@ function fetchFile() {
             "filename" : fileName
         }))
     }
-    else { alert( 'No link to Render sock' ) }
+    else { editor.session.setValue( 'Link to render socket not established (yet?)' ) }
 }
 var blobUrl;
 const blobify = ( bUrl, data ) => {
@@ -69,13 +68,15 @@ const blobify = ( bUrl, data ) => {
 };
 function saveSource( filename, fileformat ) {
     let url;
-    if ( fileformat == '.rakudoc'  ) {
+    if ( fileformat == 'HTML'  ) {
+        url = window.blobUrl;
+    }
+    else {
         let source = editor.session.getValue();
         let blob = new Blob([source], { type: 'text/plain' });
         url = window.URL.createObjectURL(blob);
-    }
-    else {
-        url = window.blobUrl;
+        fileName = filename + fileformat;
+
     }
     const link = document.createElement('a');
     link.href = url;
@@ -108,9 +109,16 @@ window.addEventListener('load', function () {
     downloadName = document.getElementById('downloadName');
     onlineFramework = document.getElementById('onlineFramework');
     renderFrame = document.getElementById('renderFrame');
-    // hide popups when radio buttons changed
-    document.getElementById('renderOptions').addEventListener('change', (e) => {  hideAll('all')});
-    document.getElementById('frameworkOptions').addEventListener('change', (e) => { hideAll('all')});
+    // hide popups when radio buttons changed and force a render for framework
+    document.getElementById('renderOptions').addEventListener('change', (e) => { 
+         hideAll('all');
+         // flush the changes to render when toggle back to auto
+         if ( e.target.id == 'autoRender' ) { sendSource() }
+    });
+    document.getElementById('frameworkOptions').addEventListener('change', (e) => { 
+        hideAll('all');
+        sendSource();
+    });
 
     // Rendering
     forceRenderBtn.addEventListener('click', function() {
@@ -118,7 +126,7 @@ window.addEventListener('load', function () {
         // cancel accumulating timer
         clearTimeout(timerId);
         // do not force if already rendering
-        if ( renderingToggle ) { return };
+        if ( renderInProgress ) { return };
         sendSource();
     });
     // getting source section
@@ -143,10 +151,10 @@ window.addEventListener('load', function () {
         // after fetch make select element disappear
         sampleSelection.classList.add('hidden');
     });
+    // initial source, which is the first item in the object
     fileName = Object.values(selectionOptions[0])[0];
     fileNameInput.value = fileName;
-    // initial source, which is the first item in the object
-    fetchFile();
+    // defer fetching file until socket established
     uploadFile.addEventListener('click', function() {
         hideAll('upload');
         filePicker.classList.toggle('hidden');
@@ -180,6 +188,7 @@ window.addEventListener('load', function () {
     downloadForm.addEventListener( 'submit', function( elem )  {
         elem.preventDefault();
         saveSource( downloadName.value, saveFormat.value);
+        fileNameInput.value = fileName;
         downloadForm.classList.add('hidden');
         return false // prevent default action
     });
@@ -196,7 +205,10 @@ window.addEventListener('load', function () {
     const connectRender = function() {
         // Return a promise, which will wait for the socket to open
         const socketProtocol = (window.location.protocol === 'https:' ? 'wss:' : 'ws:');
-        const socketUrl = `${socketProtocol}//${window.location.hostname}/browser-socket`;
+        //let url = window.location.hostname;
+        //let port = window.location.port;
+        //if (url == 'localhost' ) { url = 'localhost:3000' };
+        const socketUrl = `${socketProtocol}//${window.location.hostname}:${window.location.port}/browser-socket`;
         return new Promise((resolve, reject) => {
             browserSocket = new WebSocket(socketUrl);
             // This will fire once the socket opens
@@ -253,4 +265,6 @@ window.addEventListener('load', function () {
         timerId = setTimeout( sendSource(), 500 );
     });
     if (browserSocket == null ) { connectRender() }
+    // now fetch first file
+    fetchFile();
 });

@@ -65,7 +65,7 @@ my $app = route {
                         $html = $try-online ?? $rdp-online.render($ast) !! $rdp.render($ast);
                         $renderState = True;
                     }
-                    emit({ :$html, $renderState })
+                    emit({ :$html, :$renderState })
                 }
                 if $json<loaded> {
                     emit({ :connection<Confirmed> })
@@ -91,8 +91,10 @@ my Cro::Service $http = Cro::HTTP::Server.new(
     ]
 );
 $http.start;
+say "Listening at http://$host:$port";
 react {
     whenever signal(SIGINT) {
+        say "Shutting down";
         $http.stop;
         done;
     }
