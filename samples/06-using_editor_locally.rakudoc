@@ -1,91 +1,36 @@
-
+=document :!auto-toc
 =begin rakudoc
-=TITLE Tutorial articles
-=begin SUBTITLE
-This is the first article in a series about the markup language RakuDoc. 
-In subsequent articles I will explore some of the interesting aspects of RakuDoc and 
-how to add customisations.
+=TITLE Run the RakuDoc editor locally
+=for AUTHOR :hidden
+Richard Hainswotth, aka finanalyst
 
-In this first article, I want to discuss how RakuDoc came about, why its design allows for a 
-wide use.
-=end SUBTITLE
+Since the full renderer to handle citations and various other plugins has some large dependencies, I have created 
 
-=head Raku and RakuDoc
+The following is written assuming a Linux OS and so it should work with, eg.,  Ubuntu and Apple. 
+I have not tested this with a MS system, and I would be happy to have comments to adapt the following.
 
-The Raku language belongs to the family of Perl variations (and was originally known as Perl 6).
-The culture surrounding Raku includes as highly recommended several good coding practices, 
-such as extensive unit testing, and documentation.
+Let's start. 
 
-To facilitate documentation, Raku comes with its own markup language, called RakuDoc. 
-The intention is that documentation can be included inside a program, in a similar way to inline comments, but it can also be used in standalone files to document how to use the software. RakuDoc has also taken into account Donald Knuth's L<literate coding|https://en.wikipedia.org/wiki/Literate_programming> ideas, although RakuDoc does not develop the fundamental ideas in the same way as others have. 
-
-Furthermore, software development has dramatically changed since Knuth: virtually all projects have many dependencies, and libraries are written that are not ever intended to be the final customer-facing product. Consequently, documentation has two distinct faces:
-
-=numitem maintainer or code-oriented, meaning that information is given about the algorithm or the purpose of variables. This information is never intended to be available to a user of the software;
-=numitem developer or text-oriented, meaning that information is given about how to use the software, and the purpose of the external interfaces.
-
-Consequently, the documentation language for Raku needed to be usable inside the code, and also to create manual pages for developers using the software.
-
-The result - RakuDoc - is extensively used inside code modules, but it is also used in stand-alone files. The entire documentation for the L<Raku language|https://docs.raku.org> is written in some 700 RakuDoc files.
-
-=head Beyond documentation
-
-It is almost certain that readers of this article have used both I<Markdown> and I<MS Word> (or its FOSS equivalent I<LibreOffice>). There are other editor/format systems, but I'll use these two for simplicity. 
-
-I<Markdown> dominates the web (and is used eg., for B<Github>, B<WordPress>) because it is simple, and converts naturally into HTML.
-
-I<Word (LibreOffice)> dominates the corporate space because (in part) it makes it easy for non-specialists to create documents that have different styles, automatic Tables of Contents, footnotes, and so on.
-
-Expert users, however, find that I<Markdown> is too simple - it does not allow for Tables of Content linked to headings, or footnotes that link back to the source, and custom content blocks. These limitations have been redressed in several ways, but only by creating different B<flavours> of I<Markdown>. A consequence of the ad hoc additions is that each type of functionality has a different syntax.
-
-I<Word (LibreOffice)> by contrast is too complex. It is quite easy to create a glitch, say a bold style that extends too far, or bullets points that have different styling because the line end has been deleted. The only practical way to solve these issues is to delete enough text to eliminate the underlying style marker, and start again.
-
-It is a difficult task to create a I<Word> file programmatically, not least because the underlying format is considered proprietary. I<LibreOffice> files can be created programmatically, and then converted to Word.
-
-RakuDoc is located between these extremes: it was not designed to be rendered as a document is written. The RakuDoc source can be read and easily understood by a human author, and then the source is rendered into a format, such as I<HTML>, I<pdf> or I<epub> format, which is read by the end user. 
-
-To handle different styled text, such as bold, underline, RakuDoc text has markers which B<declaratively> indicate how the text should be treated by a renderer. I<Markdown> also uses markers that map closely to an HTML rendering, eg C«=head», C«*», C«_». The declarative nature of RakuDoc's markup means that its C«B<>» stands for B<Basic> not B<bold>, and it is left to the renderer as to what that means in say HTML or epub. Furthermore, RakuDoc has a single syntax for the markers, and the possibility to add markers.
-
-In addition to text markers, RakuDoc has blocks that operate on chunks of text. These blocks can be associated with meta data, allowing for different styling, and customisation.
-
-=head Some interactive steps
-
-Just to test the system and to give a flavour of RakuDoc, try adding another C<item> after the item below
-=for item :bullet<<\c[tulip]>>
-First item
-
-For example, copy the two lines between the C<=begin code> and C<=end code> in the following 
-and insert it after C<First item> line above in this pane.
-(You might find it easier to read the rendered HTML on the right first)
+=numitem We need to have [podman](https://podman-desktop.io/) installed.   
+=begin numitem
+In a terminal
 =begin code
-=for item :bullet<<\c[turkey]>>
-Second item
+podman pull docker.io/finanalyst/browser-editor:latest
+podman run -d --name rakedit  --network=host --rm docker.io/finanalyst/rakudoc_browser:latest
 =end code
-
-Some commentary on this new text:  
-
-The line C«=item First item» would create a bullet point similar to C«- First item» in I<Markdown>.  
-
-However, it is possible to change the bullet item by item by adding meta data to the C«item» block. In order to distinguish between a block without meta data C«=item First» and one with meta data, we use the C«=for» directive.
-
-Item blocks will accept a C«:bullet» option. The contents of the bullet option are then interpreted as the bullet. Raku has several bracketing syntaxes, and the C«<<»/C«>>» brackets (or the Unicode equivalents C<« »>) take the contents and treat them as an interpolated string. C«\c[  ]» takes the content as a Unicode symbol name and its interpolated value is the Unicode character. Consequently C«\c[turkey]» is the Unicode icon  (U+1F983).
-
-So now add the following code below the second item
+For Mac users, try
 =begin code
-=for item2 :bullet<<\c[world]>>
-sub second item
+podman pull docker.io/finanalyst/browser-editor:latest
+podman run -d  --name rakedit --platform linux/amd64 --rm docker.io/finanalyst/rakudoc_browser:latest
 =end code
-and now there is a second level item with a new bullet.
+=end numitem
+=numitem Set a browser's URL to C<localhost:3000>
+=numitem Use the Editor as described in the Introduction
+=begin numitem
+End the container (using the id after C<--name> in the run command)
+=code
+podman stop rakedit
+=end numitem
 
-Finally, lets show a bit of customisation. Try adding the following lines before the last line (C«=end rakudoc»)
-=begin code
-=config item :bullet<<\c[rose]>>
-=item a new item
-=item a second item
-=item and a third one
-=end code
-
-Here the meta option C«:bullet<<\c[rose]>>» in the C«=config» statement is distributed to all the C«=item» blocks implicitly. Consequently, all the following item blocks will have that bullet option automatically.
-
-Future articles will look at the different block types, and some custom blocks that include maps and formula, and different markup formats, such as C«B<>» and C«C<>».
+=place semantic:AUTHOR :caption<Author>
 =end rakudoc
