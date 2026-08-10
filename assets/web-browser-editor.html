@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="browser.css"/>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.39.1/ace.js" integrity="sha512-tGc7XQXpQYGpFGmdQCEaYhGdJ8B64vyI9c8zdEO4vjYaWRCKYnLy+HkudtawJS3ttk/Pd7xrkRjK8ijcMMyauw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <link rel="icon" href="https://irclogs.raku.org/favicon.ico">
-        <script src="selection-options.js"></script>
+        <script src="dynamics.js"></script>
         <script src="web-browser-editor.js"></script>
     </head>
     <body>
@@ -65,6 +65,26 @@
                 <div id="success" class="hidden" title="Rendering complete">&nbsp;</div>
                 <div id="changes" title="Source changes not rendered">&nbsp;</div>
             </fieldset>
+            <fieldset id="about">
+                <legend>About</legend>
+                <div class="control">
+                    <button id="aboutInfo">Info</button>
+                    <div id="about_info" class="hidden">
+                        <details name="about-bits">
+                            <summary>Credits</summary><p id="credits"></p>
+                        </details>
+                        <details name="about-bits">
+                            <summary>Based on</summary><p id="based-on"></p>
+                        </details>
+                        <details name="about-bits">
+                            <summary>Source</summary><p id="source"></p>
+                        </details>
+                        <details name="about-bits">
+                            <summary>Made on</summary><p id="made-on"></p>
+                        </details>
+                    </div>
+                </div>
+            </fieldset>
         </div>
         <div id="content">
             <div id="editor-panel">
@@ -73,6 +93,5 @@
             <div id="preview-panel">
                 <iframe id="renderFrame"></iframe>
             </div>
-        </div>
     </body>
 </html>

@@ -56,6 +56,15 @@
                 }
             }
         }
+        #about_info {
+            z-index: 5;
+            position: absolute;
+            translate: -12rem 2rem;
+            background-color: ghostwhite;
+            border-radius: 5px;
+            padding: 5px;
+            width: 15rem;
+        }
         #sourceFileInput {
             border: none;
             align-self: baseline;

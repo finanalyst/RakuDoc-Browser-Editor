@@ -1,7 +1,7 @@
 {
     "name": "RakuDoc-Browser-Editor",
     "description": "Browser side editor for RakuDoc, launched from container",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "raku": "6.d",
     "authors": [
         "Richard Hainsworth"

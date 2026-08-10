@@ -7,8 +7,8 @@ WORKDIR browser
 ARG CACHEBUST=abc
 COPY samples/ ./samples
 COPY assets/ ./assets
-COPY MakeOptions.raku .
-RUN raku MakeOptions.raku
+COPY MakeDynamics.raku .
+RUN raku MakeDynamics.raku
 RUN sass assets/browser.scss:assets/browser.css
 COPY WebServeBrowser.raku .
 RUN raku -c WebServeBrowser.raku
