@@ -2,7 +2,7 @@
 =begin rakudoc
 =TITLE Run the RakuDoc editor locally
 =for AUTHOR :hidden
-Richard Hainswotth, aka finanalyst
+Richard Hainsworth, aka finanalyst
 
 Since the full renderer to handle citations and various other plugins has some large dependencies, I have created 
 

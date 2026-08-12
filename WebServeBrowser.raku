@@ -41,29 +41,51 @@ my $app = route {
         web-socket :json, -> $incoming {
             supply whenever $incoming -> $message {
                 my $json = await $message.body;
-                if $json<source> {
+                if $json<source>:exists {
                     my $ast;
                     my $try-online;
                     my $html;
                     my Bool $renderState = False;
-                    try { $ast = $json<source>.AST }
-                    if $! {
-                        $html = q:to/TOP/ ~ $!.message ~ q:to/END/;
-                        <html>
-                        <head><title>Parsing error</title></head>
-                        <body><p>The RakuDoc source has an error:</p>
-                        <p>
-                        TOP
-                        </p>
-                        </body>
-                        </html>
-                        END
-                        $renderState = False;
+                    if $json<source> {
+                        try { $ast = $json<source>.AST }
+                        if $! {
+                            $html = q:to/TOP/ ~ $!.message ~ q:to/END/;
+                            <html>
+                            <head><title>Parsing error</title></head>
+                            <body><p>The RakuDoc source has an error:</p>
+                            <p>
+                            TOP
+                            </p>
+                            </body>
+                            </html>
+                            END
+                            $renderState = False;
+                        }
+                        elsif $ast.rakudoc {
+                            $try-online = $json<online> // False;
+                            $html = $try-online ?? $rdp-online.render($ast) !! $rdp.render($ast);
+                            $renderState = True;
+                        }
+                        else {
+                            $html = q:to/NORAK/;
+                            <html>
+                            <head><title>No RakuDoc source</title></head>
+                            <body><p>Source has no RakuDoc content</p>
+                            </body>
+                            </html>
+                            NORAK
+                            $renderState = True;
+                        }
                     }
                     else {
-                        $try-online = $json<online> // False;
-                        $html = $try-online ?? $rdp-online.render($ast) !! $rdp.render($ast);
-                        $renderState = True;
+                        $html = q:to/EMPTY/;
+                            <html>
+                            <head><title>Source empty</title></head>
+                            <body><p>No source content was sent</p>
+                            </body>
+                            </html>
+                            EMPTY
+                            $renderState = True;
                     }
                     emit({ :$html, :$renderState })
                 }

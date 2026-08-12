@@ -204,9 +204,12 @@ window.addEventListener('load', function () {
     });
 
     editor = ace.edit("editor");
+    editor.setTheme("ace/theme/crimson_editor");
+    editor.session.setMode("ace/mode/raku");
     editor.setOptions({
        behavioursEnabled: true,
-       autoScrollEditorIntoView: true
+       autoScrollEditorIntoView: true,
+       wrap: "free"
     });
     // credit: This javascript file is adapted from
     // https://fjolt.com/article/javascript-websockets

@@ -1,7 +1,7 @@
 {
     "name": "RakuDoc-Browser-Editor",
     "description": "Browser side editor for RakuDoc, launched from container",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "raku": "6.d",
     "authors": [
         "Richard Hainsworth"
@@ -11,7 +11,9 @@
         "Cro::HTTP::Router",
         "Cro::HTTP::Server",
         "Cro::HTTP::Log::File",
-        "Rakuast::RakuDoc::Render"
+        "Rakuast::RakuDoc::Render",
+        "RakuDoc::To::HTML",
+        "RakuDoc::To::HTML-Extra"
     ],
     "support": {
         "email": "richard@hainsworth.wales",
