@@ -204,8 +204,8 @@ window.addEventListener('load', function () {
     });
 
     editor = ace.edit("editor");
-    editor.setTheme("ace/theme/crimson_editor");
-    editor.session.setMode("ace/mode/raku");
+    editor.session.setMode("ace/mode/rakudoc");
+    editor.setTheme("ace/theme/dawn");
     editor.setOptions({
        behavioursEnabled: true,
        autoScrollEditorIntoView: true,
